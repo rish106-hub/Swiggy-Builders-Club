@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { llmComplete } from "@/lib/llm";
 import { v4 as uuidv4 } from "uuid";
 import { runFoodAgent } from "./food-agent";
 import { runInstamartAgent } from "./instamart-agent";
@@ -14,7 +14,6 @@ import type {
   AgentStatus,
 } from "@/types";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 export interface OrchestrationResult {
   plan: OccasionPlan;
@@ -138,16 +137,11 @@ Generate a warm, concise occasion plan summary (under 150 words) for:
 End with: "Want me to book this? Or see 2 alternatives?"
 Be conversational, not robotic. Use ₹ for rupees. Mention specific savings.`;
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 300,
+  return llmComplete({
+    system: "You are Plus-One, a household commerce assistant for Swiggy. Be warm, concise, conversational.",
     messages: [{ role: "user", content: prompt }],
+    maxTokens: 300,
   });
-
-  return response.content
-    .filter((b) => b.type === "text")
-    .map((b) => b.text)
-    .join("");
 }
 
 export async function orchestrate(

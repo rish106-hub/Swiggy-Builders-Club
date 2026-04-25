@@ -1,8 +1,6 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { llmComplete } from "@/lib/llm";
 import type { HouseholdProfile, OccasionContext, DineoutAgentResult } from "@/types";
 import { DEEPLINKS } from "@/lib/mcp/client";
-
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const SYSTEM_PROMPT = `You are the Dineout Agent for Plus-One.
 
@@ -85,44 +83,14 @@ Return availability map, full cost breakdown, and deeplink. Do NOT call book_tab
   );
 
   try {
-    const mcpConfig = {
-      type: "url" as const,
-      url: process.env.MCP_DINEOUT_URL ?? "https://mcp.swiggy.com/dineout",
-      ...(process.env.SWIGGY_AUTH_TOKEN
-        ? { headers: { Authorization: `Bearer ${process.env.SWIGGY_AUTH_TOKEN}` } }
-        : {}),
-    };
+    const systemWithHint =
+      SYSTEM_PROMPT +
+      `\n\nNOTE: MCP tools unavailable. Simulate realistic Dineout offer stacking for a ₹${estimatedBill} bill. Apply GIRF 25%, ${primaryCard?.bank ?? "HDFC"} 10%, DineCash ₹${Math.min(dinecash, 200)}. Mark degraded:true. Return JSON only, no markdown fences.`;
 
-    let responseText = "";
-    try {
-      const response = await (client.beta.messages as unknown as {
-        create: (params: unknown) => Promise<{ content: Array<{ type: string; text?: string }> }>;
-      }).create({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 2048,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: userMessage }],
-        mcp_servers: [{ name: "swiggy-dineout", ...mcpConfig }],
-        betas: ["mcp-client-2025-04-04"],
-      });
-      responseText = response.content
-        .filter((b) => b.type === "text")
-        .map((b) => b.text)
-        .join("");
-    } catch {
-      const response = await client.messages.create({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 2048,
-        system:
-          SYSTEM_PROMPT +
-          `\n\nNOTE: MCP tools unavailable. Simulate realistic Dineout offer stacking for a ${estimatedBill} bill. Apply GIRF 25%, ${primaryCard?.bank ?? "HDFC"} 10%, DineCash ₹${Math.min(dinecash, 200)}. Mark degraded:true.`,
-        messages: [{ role: "user", content: userMessage }],
-      });
-      responseText = response.content
-        .filter((b) => b.type === "text")
-        .map((b) => b.text ?? "")
-        .join("");
-    }
+    const responseText = await llmComplete({
+      system: systemWithHint,
+      messages: [{ role: "user", content: userMessage }],
+    });
 
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("No JSON in dineout agent response");
