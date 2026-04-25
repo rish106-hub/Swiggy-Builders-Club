@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import type { Viewport } from "next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,7 +12,16 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Plus-One — Swiggy Household Orchestrator",
   description:
-    "Plan and execute high-stakes family occasions across Swiggy Food, Instamart & Dineout from one conversation.",
+    "Plan complete occasions across Swiggy Food, Instamart & Dineout from one conversation. Three agents, one plan, instantly.",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#FC8019",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

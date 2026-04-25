@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="32" fill="#282C3F"/>
+  <!-- Orange gradient circle -->
+  <defs>
+    <linearGradient id="og" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FC8019"/>
+      <stop offset="100%" stop-color="#FF4E00"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="24" fill="url(#og)"/>
+  <!-- +1 text -->
+  <text x="32" y="38" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="18" fill="#ffffff" letter-spacing="-1">+1</text>
+</svg>
