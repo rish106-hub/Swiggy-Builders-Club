@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# demo data (excluded from production but useful locally)
+data/household.json
 
 # vercel
 .vercel
