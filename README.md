@@ -56,7 +56,7 @@ Orchestrator (src/lib/agents/orchestrator.ts)
 |-------|-----------|
 | Framework | Next.js 15 (App Router, React 19) |
 | Styling | Tailwind CSS v4 |
-| LLM | Gemini 2.5 Flash (primary) / Claude Sonnet 4 (fallback) |
+| LLM | Claude Sonnet 4 (primary) / Gemini 2.5 Flash (fallback) |
 | MCP | Swiggy Food, Instamart, Dineout via HTTP transport |
 | Database | PostgreSQL + Drizzle ORM (optional; file fallback) |
 | Session | Redis (optional; in-memory fallback) |
@@ -263,9 +263,9 @@ The `vercel.json` config targets region `bom1` (Mumbai) for lowest latency to Sw
 The app auto-selects based on available keys:
 
 ```
-GEMINI_API_KEY set     → Gemini 2.5 Flash (primary)
-GEMINI_API_KEY missing → Claude Sonnet 4 (fallback)
-Both set               → Gemini 2.5 Flash wins
+ANTHROPIC_API_KEY set     → Claude Sonnet 4 (primary)
+ANTHROPIC_API_KEY missing → Gemini 2.5 Flash (fallback)
+Both set                  → Claude Sonnet 4 wins
 ```
 
 Override in `src/lib/llm.ts` → `activeProvider()`.
